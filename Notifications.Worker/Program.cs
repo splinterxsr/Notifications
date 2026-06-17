@@ -4,8 +4,6 @@ using Notifications.Worker.Handlers;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var host = builder.Build();
-
 #region MassTransit (RabbitMQ)
 
 builder.Services.AddMassTransit(x =>
@@ -41,6 +39,8 @@ builder.Services.AddMassTransit(x =>
 });
 
 #endregion
+
+var host = builder.Build();
 
 Console.WriteLine("Aguardando mensagens... Pressione Ctrl+C para parar.");
 
