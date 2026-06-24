@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Fcg.Contracts/Fcg.Contracts.csproj" Id="064eee7d-f5a1-4439-a5d2-d151b3adc537" />
   <Project Path="Notifications.Worker/Notifications.Worker.csproj" />
 </Solution>

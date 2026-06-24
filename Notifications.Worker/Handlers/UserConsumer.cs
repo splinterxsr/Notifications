@@ -1,6 +1,6 @@
-﻿using MassTransit;
+﻿using Fcg.Contracts;
+using MassTransit;
 using Microsoft.Extensions.Logging;
-using Notifications.Worker.Contracts;
 
 namespace Notifications.Worker.Handlers
 {
@@ -17,12 +17,12 @@ namespace Notifications.Worker.Handlers
         {
             var user = context.Message;
 
-            _logger.LogInformation("✅ Novo Usuário cadastrado:");
+            _logger.LogInformation("Novo Usuário cadastrado:");
             _logger.LogInformation("   ID: {UserId}", user.UserId);
             _logger.LogInformation("   Usuário: {UserName}", user.UserName);
             _logger.LogInformation("---------------------");
 
-            _logger.LogInformation("🔔📧 Enviando e-mail de boas vindas para o usuário {UserName} ({UserEmail})...", user.UserName, user.UserEmail);
+            _logger.LogInformation("Enviando e-mail de boas vindas para o usuário {UserName} ({UserEmail})...", user.UserName, user.UserEmail);
             _logger.LogInformation("---------------------");
         }
     }

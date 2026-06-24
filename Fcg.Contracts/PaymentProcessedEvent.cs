@@ -1,4 +1,4 @@
-﻿namespace Notifications.Worker.Contracts
+﻿namespace Fcg.Contracts
 {
     public record PaymentProcessedEvent
     {

@@ -1,6 +1,6 @@
-﻿using MassTransit;
+﻿using Fcg.Contracts;
+using MassTransit;
 using Microsoft.Extensions.Logging;
-using Notifications.Worker.Contracts;
 
 namespace Notifications.Worker.Handlers
 {
@@ -17,7 +17,7 @@ namespace Notifications.Worker.Handlers
         {
             var order = context.Message;
 
-            _logger.LogInformation("💳 Pagamento Processado:");
+            _logger.LogInformation("Pagamento Processado:");
             _logger.LogInformation("   Transaction ID: {TransactionId}", order.TransactionId);
             _logger.LogInformation("   User: {UserId}", order.UserId);
             _logger.LogInformation("   Game: {GameId}", order.GameId);
@@ -25,10 +25,10 @@ namespace Notifications.Worker.Handlers
 
             if (order.Status == PaymentStatus.Approved)
             {
-                _logger.LogInformation("✅ Pagamento aprovado com sucesso!");
+                _logger.LogInformation("Pagamento aprovado com sucesso!");
                 _logger.LogInformation("---");
 
-                _logger.LogInformation("🔔📧 Enviando e-mail de confirmação de compra ao usuário {UserId} ({UserEmail})...", order.UserId, order.UserEmail);
+                _logger.LogInformation("Enviando e-mail de confirmação de compra ao usuário {UserId} ({UserEmail})...", order.UserId, order.UserEmail);
                 _logger.LogInformation("---------------------");
             }
         }
