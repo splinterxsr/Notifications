@@ -24,27 +24,27 @@ spec:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: notifications-worker-secrets
                   key: RABBITMQ_DEFAULT_USER
             - name: RABBITMQ_DEFAULT_PASS
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: notifications-worker-secrets
                   key: RABBITMQ_DEFAULT_PASS
             - name: RABBITMQ_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: notifications-worker-config
                   key: RABBITMQ_HOST
             - name: USER_QUEUE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: notifications-worker-config
                   key: USER_QUEUE_NAME
             - name: PAYMENT_QUEUE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: notifications-worker-config
                   key: PAYMENT_QUEUE_NAME
           resources:
             requests:
