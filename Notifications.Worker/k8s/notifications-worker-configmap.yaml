@@ -3,6 +3,4 @@ kind: ConfigMap
 metadata:
   name: notifications-worker-config
 data:
-  RABBITMQ_HOST: "rabbitmq-service"
   USER_QUEUE_NAME: "users-queue"
-  PAYMENT_QUEUE_NAME: "payments-queue"
