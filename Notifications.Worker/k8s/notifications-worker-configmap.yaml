@@ -4,3 +4,4 @@ metadata:
   name: notifications-worker-config
 data:
   USER_QUEUE_NAME: "users-queue"
+  PAYMENT_QUEUE_NAME: "payments-2-queue"
