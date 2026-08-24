@@ -1,0 +1,40 @@
+service: notifications-lambda
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  endpointType: regional 
+  ecr:
+    images:
+      notifications-image:
+        path: ./
+
+functions:
+  paymentNotification:
+    image:
+      name: notifications-image
+      command:
+        - Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:000000000000:payments-2-queue
+
+  userNotification:
+    image:
+      name: notifications-image
+      command:
+        - Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:000000000000:users-queue
+
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
