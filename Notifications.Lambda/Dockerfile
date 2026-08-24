@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["Notifications.Lambda.csproj", "./"]
+COPY ["Notifications.Lambda/Notifications.Lambda.csproj", "./"]
 RUN dotnet restore "Notifications.Lambda.csproj"
 
 COPY . .
