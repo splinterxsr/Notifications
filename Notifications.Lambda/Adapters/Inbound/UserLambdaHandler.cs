@@ -39,10 +39,11 @@ namespace Notifications.Lambda.Adapters.Inbound
         {
             foreach (var message in sqsEvent.Records)
             {
+                // Impressão síncrona forçada garantindo a exibição do log na nuvem
+                context.Logger.LogInformation($"[SQS Lambda] MENSAGEM RECEBIDA (User)! Body: {message.Body}");
+
                 try
                 {
-                    _logger.LogInformation($"[SQS Lambda] Mensagem bruta recebida: {message.Body}");
-
                     UserCreatedEvent userEvent = null;
 
                     try
@@ -60,7 +61,7 @@ namespace Notifications.Lambda.Adapters.Inbound
 
                     if (userEvent != null && !string.IsNullOrEmpty(userEvent.UserEmail))
                     {
-                        _logger.LogInformation($"[SQS Lambda] Usuário desserializado com sucesso: {userEvent.UserName} ({userEvent.UserEmail})");
+                        context.Logger.LogInformation($"[SQS Lambda] Usuário desserializado com sucesso: {userEvent.UserName} ({userEvent.UserEmail})");
 
                         var notification = new NotificationMessage
                         {
@@ -70,15 +71,16 @@ namespace Notifications.Lambda.Adapters.Inbound
                         };
 
                         await _useCase.ExecuteAsync(notification);
+                        context.Logger.LogInformation($"[SQS Lambda] E-mail de boas-vindas simulado com sucesso!");
                     }
                     else
                     {
-                        _logger.LogWarning("[SQS Lambda] Não foi possível mapear o UserCreatedEvent do body.");
+                        context.Logger.LogInformation("[SQS Lambda] ALERTA: Não foi possível mapear o UserCreatedEvent do body.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"[SQS Lambda] Erro crítico ao processar mensagem: {ex.Message}");
+                    context.Logger.LogInformation($"[SQS Lambda] ERRO CRÍTICO no usuário: {ex.Message}");
                     throw;
                 }
             }

@@ -41,10 +41,11 @@ namespace Notifications.Lambda.Adapters.Inbound
         {
             foreach (var message in sqsEvent.Records)
             {
+                // Impressão síncrona forçada garantindo a exibição do log na nuvem
+                context.Logger.LogInformation($"[SQS Lambda] MENSAGEM RECEBIDA (Payment)! Body: {message.Body}");
+
                 try
                 {
-                    _logger.LogInformation($"[SQS Lambda] Processando pagamento, mensagem bruta: {message.Body}");
-
                     PaymentProcessedEvent paymentEvent = null;
 
                     try
@@ -62,7 +63,7 @@ namespace Notifications.Lambda.Adapters.Inbound
 
                     if (paymentEvent != null && paymentEvent.Status == PaymentStatus.Approved)
                     {
-                        _logger.LogInformation($"[SQS Lambda] Pagamento processado com sucesso para o usuário: {paymentEvent.UserEmail}");
+                        context.Logger.LogInformation($"[SQS Lambda] Pagamento processado com sucesso para o usuário: {paymentEvent.UserEmail}");
 
                         var notification = new NotificationMessage
                         {
@@ -72,15 +73,16 @@ namespace Notifications.Lambda.Adapters.Inbound
                         };
 
                         await _useCase.ExecuteAsync(notification);
+                        context.Logger.LogInformation($"[SQS Lambda] E-mail de confirmação de pagamento simulado com sucesso!");
                     }
                     else
                     {
-                        _logger.LogWarning("[SQS Lambda] Não foi possível mapear o PaymentProcessedEvent do body ou o status não é Approved.");
+                        context.Logger.LogInformation("[SQS Lambda] ALERTA: Não foi possível mapear o PaymentProcessedEvent ou o status não é Approved.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"[SQS Lambda] Erro ao processar mensagem de pagamento: {ex.Message}");
+                    context.Logger.LogInformation($"[SQS Lambda] ERRO CRÍTICO no pagamento: {ex.Message}");
                     throw;
                 }
             }

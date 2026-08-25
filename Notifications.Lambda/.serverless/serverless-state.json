@@ -7,7 +7,7 @@
     "provider": {
       "name": "aws",
       "region": "us-east-1",
-      "runtime": "dotnet6",
+      "runtime": "dotnet8",
       "endpointType": "regional",
       "stage": "dev",
       "versionFunctions": true,
@@ -162,8 +162,18 @@
                           "sqs:GetQueueAttributes"
                         ],
                         "Resource": [
-                          "arn:aws:sqs:us-east-1:000000000000:payments-2-queue",
-                          "arn:aws:sqs:us-east-1:000000000000:users-queue"
+                          {
+                            "Fn::GetAtt": [
+                              "PaymentsQueue",
+                              "Arn"
+                            ]
+                          },
+                          {
+                            "Fn::GetAtt": [
+                              "UsersQueue",
+                              "Arn"
+                            ]
+                          }
                         ]
                       }
                     ]
@@ -193,10 +203,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z/lambda.zip"
+                "S3Key": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z/package.zip"
               },
               "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler",
-              "Runtime": "dotnet6",
+              "Runtime": "dotnet8",
               "FunctionName": "notifications-lambda-local-paymentNotification",
               "MemorySize": 1024,
               "Timeout": 6,
@@ -218,10 +228,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z/lambda.zip"
+                "S3Key": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z/package.zip"
               },
               "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler",
-              "Runtime": "dotnet6",
+              "Runtime": "dotnet8",
               "FunctionName": "notifications-lambda-local-userNotification",
               "MemorySize": 1024,
               "Timeout": 6,
@@ -236,34 +246,39 @@
               "UserNotificationLogGroup"
             ]
           },
-          "PaymentNotificationLambdaVersionz2oGRJHD38jBtIZDAnBq8hGT5MKyvG0umKTIlNY3uA": {
+          "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "PaymentNotificationLambdaFunction"
               },
-              "CodeSha256": "I9OoyvbrHRHzUL+a+KDhh7GK3zsT5Vvvwq3KLhMO6xg="
+              "CodeSha256": "GyP33nZlU+NRjEZ0mgDf06ZTlz6WlX+Tv83Fo7qvGh0="
             }
           },
-          "UserNotificationLambdaVersion0ZIIP0mfjdE600RyFYayy00Yisuy2hHgLirnCMnUTXM": {
+          "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UserNotificationLambdaFunction"
               },
-              "CodeSha256": "I9OoyvbrHRHzUL+a+KDhh7GK3zsT5Vvvwq3KLhMO6xg="
+              "CodeSha256": "GyP33nZlU+NRjEZ0mgDf06ZTlz6WlX+Tv83Fo7qvGh0="
             }
           },
-          "PaymentNotificationEventSourceMappingSQSPayments2queue": {
+          "PaymentNotificationEventSourceMappingSQSPaymentsQueue": {
             "Type": "AWS::Lambda::EventSourceMapping",
             "DependsOn": [
               "IamRoleLambdaExecution"
             ],
             "Properties": {
               "BatchSize": 10,
-              "EventSourceArn": "arn:aws:sqs:us-east-1:000000000000:payments-2-queue",
+              "EventSourceArn": {
+                "Fn::GetAtt": [
+                  "PaymentsQueue",
+                  "Arn"
+                ]
+              },
               "FunctionName": {
                 "Fn::GetAtt": [
                   "PaymentNotificationLambdaFunction",
@@ -273,14 +288,19 @@
               "Enabled": true
             }
           },
-          "UserNotificationEventSourceMappingSQSUsersqueue": {
+          "UserNotificationEventSourceMappingSQSUsersQueue": {
             "Type": "AWS::Lambda::EventSourceMapping",
             "DependsOn": [
               "IamRoleLambdaExecution"
             ],
             "Properties": {
               "BatchSize": 10,
-              "EventSourceArn": "arn:aws:sqs:us-east-1:000000000000:users-queue",
+              "EventSourceArn": {
+                "Fn::GetAtt": [
+                  "UsersQueue",
+                  "Arn"
+                ]
+              },
               "FunctionName": {
                 "Fn::GetAtt": [
                   "UserNotificationLambdaFunction",
@@ -288,6 +308,18 @@
                 ]
               },
               "Enabled": true
+            }
+          },
+          "PaymentsQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+              "QueueName": "payments-2-queue"
+            }
+          },
+          "UsersQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+              "QueueName": "users-queue"
             }
           }
         },
@@ -303,7 +335,7 @@
           "PaymentNotificationLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "PaymentNotificationLambdaVersionz2oGRJHD38jBtIZDAnBq8hGT5MKyvG0umKTIlNY3uA"
+              "Ref": "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno"
             },
             "Export": {
               "Name": "sls-notifications-lambda-local-PaymentNotificationLambdaFunctionQualifiedArn"
@@ -312,7 +344,7 @@
           "UserNotificationLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UserNotificationLambdaVersion0ZIIP0mfjdE600RyFYayy00Yisuy2hHgLirnCMnUTXM"
+              "Ref": "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw"
             },
             "Export": {
               "Name": "sls-notifications-lambda-local-UserNotificationLambdaFunctionQualifiedArn"
@@ -423,7 +455,9 @@
         "events": [
           {
             "sqs": {
-              "arn": "arn:aws:sqs:us-east-1:000000000000:payments-2-queue"
+              "arn": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"IamRoleLambdaExecution\"][\"Properties\"][\"Policies\"][0][\"PolicyDocument\"][\"Statement\"][2][\"Resource\"][0]"
+              }
             }
           }
         ],
@@ -431,16 +465,18 @@
         "package": {},
         "memory": 1024,
         "timeout": 6,
-        "runtime": "dotnet6",
+        "runtime": "dotnet8",
         "vpc": {},
-        "versionLogicalId": "PaymentNotificationLambdaVersionz2oGRJHD38jBtIZDAnBq8hGT5MKyvG0umKTIlNY3uA"
+        "versionLogicalId": "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno"
       },
       "userNotification": {
         "handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler",
         "events": [
           {
             "sqs": {
-              "arn": "arn:aws:sqs:us-east-1:000000000000:users-queue"
+              "arn": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"IamRoleLambdaExecution\"][\"Properties\"][\"Policies\"][0][\"PolicyDocument\"][\"Statement\"][2][\"Resource\"][1]"
+              }
             }
           }
         ],
@@ -448,10 +484,27 @@
         "package": {},
         "memory": 1024,
         "timeout": 6,
-        "runtime": "dotnet6",
+        "runtime": "dotnet8",
         "vpc": {},
-        "versionLogicalId": "UserNotificationLambdaVersion0ZIIP0mfjdE600RyFYayy00Yisuy2hHgLirnCMnUTXM"
+        "versionLogicalId": "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw"
       }
+    },
+    "resources": {
+      "Resources": {
+        "PaymentsQueue": {
+          "Type": "AWS::SQS::Queue",
+          "Properties": {
+            "QueueName": "payments-2-queue"
+          }
+        },
+        "UsersQueue": {
+          "Type": "AWS::SQS::Queue",
+          "Properties": {
+            "QueueName": "users-queue"
+          }
+        }
+      },
+      "Outputs": {}
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
@@ -468,19 +521,22 @@
         "$ref": "$[\"service\"][\"custom\"]"
       },
       "package": {
-        "artifact": "lambda.zip",
+        "artifact": "package.zip",
         "artifactsS3KeyDirname": "serverless/notifications-lambda/local/code-artifacts",
-        "artifactDirectoryName": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z"
+        "artifactDirectoryName": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
       }
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z",
-    "artifact": "lambda.zip"
+    "artifactDirectoryName": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z",
+    "artifact": "package.zip"
   }
 }

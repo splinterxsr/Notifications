@@ -4,7 +4,7 @@ frameworkVersion: '3'
 provider:
   name: aws
   region: us-east-1
-  runtime: dotnet6
+  runtime: dotnet8
   endpointType: regional 
 
 plugins:
@@ -18,17 +18,29 @@ custom:
     edgePort: 4566
 
 package:
-  artifact: lambda.zip
+  artifact: package.zip
 
 functions:
   paymentNotification:
     handler: Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler
     events:
       - sqs:
-          arn: arn:aws:sqs:us-east-1:000000000000:payments-2-queue
+          arn:
+            Fn::GetAtt: [PaymentsQueue, Arn]
 
   userNotification:
     handler: Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler
     events:
       - sqs:
-          arn: arn:aws:sqs:us-east-1:000000000000:users-queue
+          arn:
+            Fn::GetAtt: [UsersQueue, Arn]
+resources:
+  Resources:
+    PaymentsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: payments-2-queue
+    UsersQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: users-queue
