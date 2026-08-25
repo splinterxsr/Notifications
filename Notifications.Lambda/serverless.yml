@@ -4,30 +4,8 @@ frameworkVersion: '3'
 provider:
   name: aws
   region: us-east-1
+  runtime: dotnet6
   endpointType: regional 
-  ecr:
-    images:
-      notifications-image:
-        path: ./
-
-functions:
-  paymentNotification:
-    image:
-      name: notifications-image
-      command:
-        - Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler
-    events:
-      - sqs:
-          arn: arn:aws:sqs:us-east-1:000000000000:payments-2-queue
-
-  userNotification:
-    image:
-      name: notifications-image
-      command:
-        - Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler
-    events:
-      - sqs:
-          arn: arn:aws:sqs:us-east-1:000000000000:users-queue
 
 plugins:
   - serverless-localstack
@@ -38,3 +16,19 @@ custom:
       - local
     host: http://localhost
     edgePort: 4566
+
+package:
+  artifact: lambda.zip
+
+functions:
+  paymentNotification:
+    handler: Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:000000000000:payments-2-queue
+
+  userNotification:
+    handler: Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:000000000000:users-queue

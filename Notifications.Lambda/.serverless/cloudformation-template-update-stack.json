@@ -1,0 +1,309 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PaymentNotificationLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/notifications-lambda-local-paymentNotification"
+      }
+    },
+    "UserNotificationLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/notifications-lambda-local-userNotification"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "notifications-lambda",
+                  "local",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/notifications-lambda-local*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/notifications-lambda-local*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": [
+                    "arn:aws:sqs:us-east-1:000000000000:payments-2-queue",
+                    "arn:aws:sqs:us-east-1:000000000000:users-queue"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "notifications-lambda",
+              "local",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "PaymentNotificationLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z/lambda.zip"
+        },
+        "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler",
+        "Runtime": "dotnet6",
+        "FunctionName": "notifications-lambda-local-paymentNotification",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "PaymentNotificationLogGroup"
+      ]
+    },
+    "UserNotificationLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/notifications-lambda/local/1787660208920-2026-08-25T12:16:48.920Z/lambda.zip"
+        },
+        "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler",
+        "Runtime": "dotnet6",
+        "FunctionName": "notifications-lambda-local-userNotification",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "UserNotificationLogGroup"
+      ]
+    },
+    "PaymentNotificationLambdaVersionz2oGRJHD38jBtIZDAnBq8hGT5MKyvG0umKTIlNY3uA": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PaymentNotificationLambdaFunction"
+        },
+        "CodeSha256": "I9OoyvbrHRHzUL+a+KDhh7GK3zsT5Vvvwq3KLhMO6xg="
+      }
+    },
+    "UserNotificationLambdaVersion0ZIIP0mfjdE600RyFYayy00Yisuy2hHgLirnCMnUTXM": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "UserNotificationLambdaFunction"
+        },
+        "CodeSha256": "I9OoyvbrHRHzUL+a+KDhh7GK3zsT5Vvvwq3KLhMO6xg="
+      }
+    },
+    "PaymentNotificationEventSourceMappingSQSPayments2queue": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "IamRoleLambdaExecution"
+      ],
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": "arn:aws:sqs:us-east-1:000000000000:payments-2-queue",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "PaymentNotificationLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true
+      }
+    },
+    "UserNotificationEventSourceMappingSQSUsersqueue": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "IamRoleLambdaExecution"
+      ],
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": "arn:aws:sqs:us-east-1:000000000000:users-queue",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "UserNotificationLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Enabled": true
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-notifications-lambda-local-ServerlessDeploymentBucketName"
+      }
+    },
+    "PaymentNotificationLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PaymentNotificationLambdaVersionz2oGRJHD38jBtIZDAnBq8hGT5MKyvG0umKTIlNY3uA"
+      },
+      "Export": {
+        "Name": "sls-notifications-lambda-local-PaymentNotificationLambdaFunctionQualifiedArn"
+      }
+    },
+    "UserNotificationLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "UserNotificationLambdaVersion0ZIIP0mfjdE600RyFYayy00Yisuy2hHgLirnCMnUTXM"
+      },
+      "Export": {
+        "Name": "sls-notifications-lambda-local-UserNotificationLambdaFunctionQualifiedArn"
+      }
+    }
+  }
+}
