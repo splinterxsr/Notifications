@@ -51,7 +51,7 @@ dotnet publish -c Release -o ./publish
 Compacte o resultado da compilação. *(Se estiver utilizando Windows, execute o comando abaixo no PowerShell)*:
 
 ```powershell
-Compress-Archive -Path .\publish\* -DestinationPath package.zip -Force
+Compress-Archive -Path .\publish\* -DestinationPath lambda.zip -Force
 
 ```
 
