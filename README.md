@@ -43,15 +43,15 @@ npm install -D serverless-localstack
 Gere os binários otimizados para release na pasta `publish`:
 
 ```bash
-dotnet publish -c Release -o ./publish
+dotnet publish -c Release -f net8.0 -r linux-x64 --self-contained false -o ./publish
 
 ```
 
 **3. Empacotar a Função (Zip):**
 Compacte o resultado da compilação. *(Se estiver utilizando Windows, execute o comando abaixo no PowerShell)*:
 
-```powershell
-Compress-Archive -Path .\publish\* -DestinationPath lambda.zip -Force
+```bash
+powershell Compress-Archive -Path .\publish\* -DestinationPath lambda.zip -Force
 
 ```
 
@@ -59,7 +59,7 @@ Compress-Archive -Path .\publish\* -DestinationPath lambda.zip -Force
 Faça a implantação da Lambda e a criação automática das filas SQS no LocalStack:
 
 ```bash
-npx serverless deploy --stage local
+npx serverless deploy --stage local --force
 
 ```
 
