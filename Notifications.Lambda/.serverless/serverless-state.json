@@ -203,7 +203,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z/package.zip"
+                "S3Key": "serverless/notifications-lambda/local/1787684654263-2026-08-25T19:04:14.263Z/package.zip"
               },
               "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.PaymentLambdaHandler::FunctionHandler",
               "Runtime": "dotnet8",
@@ -228,7 +228,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z/package.zip"
+                "S3Key": "serverless/notifications-lambda/local/1787684654263-2026-08-25T19:04:14.263Z/package.zip"
               },
               "Handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler",
               "Runtime": "dotnet8",
@@ -246,24 +246,24 @@
               "UserNotificationLogGroup"
             ]
           },
-          "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno": {
+          "PaymentNotificationLambdaVersionP7Btw77PoBsZ39zeaVWt2JHRHr22mYwhrVjDqo6th5A": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "PaymentNotificationLambdaFunction"
               },
-              "CodeSha256": "GyP33nZlU+NRjEZ0mgDf06ZTlz6WlX+Tv83Fo7qvGh0="
+              "CodeSha256": "Zh00alVicHjHQ32bcLdTyFM73ul1vyDBj+P1s79BuxI="
             }
           },
-          "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw": {
+          "UserNotificationLambdaVersionTuB2bj1t0ISUxKD5VTswvYpixgM4ebP1ZFJ1xBbhY": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UserNotificationLambdaFunction"
               },
-              "CodeSha256": "GyP33nZlU+NRjEZ0mgDf06ZTlz6WlX+Tv83Fo7qvGh0="
+              "CodeSha256": "Zh00alVicHjHQ32bcLdTyFM73ul1vyDBj+P1s79BuxI="
             }
           },
           "PaymentNotificationEventSourceMappingSQSPaymentsQueue": {
@@ -335,7 +335,7 @@
           "PaymentNotificationLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno"
+              "Ref": "PaymentNotificationLambdaVersionP7Btw77PoBsZ39zeaVWt2JHRHr22mYwhrVjDqo6th5A"
             },
             "Export": {
               "Name": "sls-notifications-lambda-local-PaymentNotificationLambdaFunctionQualifiedArn"
@@ -344,7 +344,7 @@
           "UserNotificationLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw"
+              "Ref": "UserNotificationLambdaVersionTuB2bj1t0ISUxKD5VTswvYpixgM4ebP1ZFJ1xBbhY"
             },
             "Export": {
               "Name": "sls-notifications-lambda-local-UserNotificationLambdaFunctionQualifiedArn"
@@ -467,7 +467,7 @@
         "timeout": 6,
         "runtime": "dotnet8",
         "vpc": {},
-        "versionLogicalId": "PaymentNotificationLambdaVersionrv21nLRRlSKXYxcRtYwgqFHm9aAF1a29YAR4TzwNzno"
+        "versionLogicalId": "PaymentNotificationLambdaVersionP7Btw77PoBsZ39zeaVWt2JHRHr22mYwhrVjDqo6th5A"
       },
       "userNotification": {
         "handler": "Notifications.Lambda::Notifications.Lambda.Adapters.Inbound.UserLambdaHandler::FunctionHandler",
@@ -486,7 +486,7 @@
         "timeout": 6,
         "runtime": "dotnet8",
         "vpc": {},
-        "versionLogicalId": "UserNotificationLambdaVersion1MuiSYxGYAB8xn8sBE1X2rk1YEJ8T0kJLT9zaRkxBw"
+        "versionLogicalId": "UserNotificationLambdaVersionTuB2bj1t0ISUxKD5VTswvYpixgM4ebP1ZFJ1xBbhY"
       }
     },
     "resources": {
@@ -523,7 +523,7 @@
       "package": {
         "artifact": "package.zip",
         "artifactsS3KeyDirname": "serverless/notifications-lambda/local/code-artifacts",
-        "artifactDirectoryName": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z"
+        "artifactDirectoryName": "serverless/notifications-lambda/local/1787684654263-2026-08-25T19:04:14.263Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -536,7 +536,7 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/notifications-lambda/local/1787678879801-2026-08-25T17:27:59.801Z",
+    "artifactDirectoryName": "serverless/notifications-lambda/local/1787684654263-2026-08-25T19:04:14.263Z",
     "artifact": "package.zip"
   }
 }

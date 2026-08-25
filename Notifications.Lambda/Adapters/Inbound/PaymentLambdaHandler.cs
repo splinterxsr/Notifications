@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Amazon.Lambda.Core;
@@ -41,29 +39,30 @@ namespace Notifications.Lambda.Adapters.Inbound
         {
             foreach (var message in sqsEvent.Records)
             {
-                // Impressão síncrona forçada garantindo a exibição do log na nuvem
                 context.Logger.LogInformation($"[SQS Lambda] MENSAGEM RECEBIDA (Payment)! Body: {message.Body}");
 
                 try
                 {
                     PaymentProcessedEvent paymentEvent = null;
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                    try
+                    using (var doc = JsonDocument.Parse(message.Body))
                     {
-                        paymentEvent = JsonSerializer.Deserialize<PaymentProcessedEvent>(message.Body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    }
-                    catch
-                    {
-                        using var doc = JsonDocument.Parse(message.Body);
-                        if (doc.RootElement.TryGetProperty("message", out var messageElement))
+                        var root = doc.RootElement;
+
+                        if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("message", out var messageElement))
                         {
-                            paymentEvent = JsonSerializer.Deserialize<PaymentProcessedEvent>(messageElement.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            paymentEvent = JsonSerializer.Deserialize<PaymentProcessedEvent>(messageElement.GetRawText(), options);
+                        }
+                        else
+                        {
+                            paymentEvent = JsonSerializer.Deserialize<PaymentProcessedEvent>(message.Body, options);
                         }
                     }
 
                     if (paymentEvent != null && paymentEvent.Status == PaymentStatus.Approved)
                     {
-                        context.Logger.LogInformation($"[SQS Lambda] Pagamento processado com sucesso para o usuário: {paymentEvent.UserEmail}");
+                        context.Logger.LogInformation($"[SQS Lambda] Mapeado com Sucesso -> Pagamento aprovado para: {paymentEvent.UserEmail} | GameId: {paymentEvent.GameId}");
 
                         var notification = new NotificationMessage
                         {
@@ -73,11 +72,11 @@ namespace Notifications.Lambda.Adapters.Inbound
                         };
 
                         await _useCase.ExecuteAsync(notification);
-                        context.Logger.LogInformation($"[SQS Lambda] E-mail de confirmação de pagamento simulado com sucesso!");
+                        context.Logger.LogInformation("[SQS Lambda] E-mail de confirmação de pagamento simulado com sucesso!");
                     }
                     else
                     {
-                        context.Logger.LogInformation("[SQS Lambda] ALERTA: Não foi possível mapear o PaymentProcessedEvent ou o status não é Approved.");
+                        context.Logger.LogInformation($"[SQS Lambda] ALERTA: Não foi possível mapear o PaymentProcessedEvent ou status diferente de Approved. Status: {paymentEvent?.Status}");
                     }
                 }
                 catch (Exception ex)

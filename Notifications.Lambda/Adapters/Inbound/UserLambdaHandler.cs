@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Amazon.Lambda.Core;
@@ -39,39 +37,53 @@ namespace Notifications.Lambda.Adapters.Inbound
         {
             foreach (var message in sqsEvent.Records)
             {
-                // Impressão síncrona forçada garantindo a exibição do log na nuvem
                 context.Logger.LogInformation($"[SQS Lambda] MENSAGEM RECEBIDA (User)! Body: {message.Body}");
 
                 try
                 {
                     UserCreatedEvent userEvent = null;
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                    try
+                    using (var doc = JsonDocument.Parse(message.Body))
                     {
-                        userEvent = JsonSerializer.Deserialize<UserCreatedEvent>(message.Body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    }
-                    catch
-                    {
-                        using var doc = JsonDocument.Parse(message.Body);
-                        if (doc.RootElement.TryGetProperty("message", out var messageElement))
+                        var root = doc.RootElement;
+
+                        // Se veio envelopado pelo MassTransit (tem o nó "message")
+                        if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("message", out var messageElement))
                         {
-                            userEvent = JsonSerializer.Deserialize<UserCreatedEvent>(messageElement.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            userEvent = JsonSerializer.Deserialize<UserCreatedEvent>(messageElement.GetRawText(), options);
+                        }
+                        else
+                        {
+                            userEvent = JsonSerializer.Deserialize<UserCreatedEvent>(message.Body, options);
                         }
                     }
 
-                    if (userEvent != null && !string.IsNullOrEmpty(userEvent.UserEmail))
+                    if (userEvent != null)
                     {
-                        context.Logger.LogInformation($"[SQS Lambda] Usuário desserializado com sucesso: {userEvent.UserName} ({userEvent.UserEmail})");
+                        string emailFinal = userEvent.UserEmail;
+                        string nomeFinal = userEvent.UserName;
+
+                        if (string.IsNullOrEmpty(emailFinal) || !emailFinal.Contains("@"))
+                        {
+                            if (!string.IsNullOrEmpty(userEvent.UserName) && userEvent.UserName.Contains("@"))
+                            {
+                                emailFinal = userEvent.UserName;
+                                nomeFinal = userEvent.UserEmail;
+                            }
+                        }
+
+                        context.Logger.LogInformation($"[SQS Lambda] Mapeado com Sucesso -> Nome: {nomeFinal} | Email: {emailFinal}");
 
                         var notification = new NotificationMessage
                         {
-                            Recipient = userEvent.UserEmail,
+                            Recipient = emailFinal,
                             Subject = "Bem-vindo à FCG - Cloud Games!",
-                            Body = $"Olá {userEvent.UserName}, seu cadastro foi realizado com sucesso!"
+                            Body = $"Olá {nomeFinal}, seu cadastro foi realizado com sucesso!"
                         };
 
                         await _useCase.ExecuteAsync(notification);
-                        context.Logger.LogInformation($"[SQS Lambda] E-mail de boas-vindas simulado com sucesso!");
+                        context.Logger.LogInformation("[SQS Lambda] E-mail de boas-vindas simulado com sucesso!");
                     }
                     else
                     {
