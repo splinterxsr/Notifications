@@ -39,13 +39,19 @@ npm install -D serverless-localstack
 
 ```
 
-**2. Compilar o projeto C# gerar Zip:**
+**2. Instalar a ferramenta global da AWS Lambda:**
+Execute o seguinte comando no terminal para instalar a ferramenta no seu sistema:
+```bash
+dotnet tool install -g Amazon.Lambda.Tools
+```
+
+**3. Compilar o projeto C# gerar Zip:**
 
 ```bash
 dotnet lambda package -o package.zip
 ```
 
-**3. Realizar o Deploy na Nuvem Local:**
+**4. Realizar o Deploy na Nuvem Local:**
 Faça a implantação da Lambda e a criação automática das filas SQS no LocalStack:
 
 ```bash
@@ -53,9 +59,11 @@ npx serverless deploy --stage local --force
 
 ```
 
-**4. Monitorar os Logs (Opcional):**
+**5. Monitorar os Logs (Opcional):**
 Para acompanhar as execuções da função e os "e-mails" sendo enviados em tempo real, deixe o comando abaixo rodando em uma janela de terminal:
 
 ```bash
 npx serverless logs -f userNotification --stage local --tail
 ```
+**Importante:**
+O comando acima só vai funcionar após alguma mensagem ser publicada ao menos 1 vez.
