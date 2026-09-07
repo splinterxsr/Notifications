@@ -20,7 +20,7 @@ A aplicação foi migrada de um Worker tradicional para uma função Serverless 
 * **Serverless Framework:** Ferramenta de Infraestrutura como Código (IaC) para implantação.
 * **LocalStack:** Simulador local do ecossistema AWS (Lambda, SQS, S3, CloudWatch Logs).
 * **MassTransit:** Abstração utilizada para ler o envelope de mensagens gerado pelos produtores.
-* **Amazon SQS:** Serviço de filas utilizado no lugar do RabbitMQ.
+* **Amazon SQS:** Serviço de filas de mensagens da AWS.
 
 ---
 
