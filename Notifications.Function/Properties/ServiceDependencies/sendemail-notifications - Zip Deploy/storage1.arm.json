@@ -12,7 +12,7 @@
     },
     "resourceGroupLocation": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "eastus2",
       "metadata": {
         "_parameterType": "location",
         "description": "Local do grupo de recursos. Os grupos de recursos podem ter um local diferente do local dos recursos."
@@ -36,7 +36,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('postechbe43', subscription().subscriptionId)))]",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('postecha3ee', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [
@@ -54,7 +54,7 @@
                 "tier": "Standard"
               },
               "kind": "StorageV2",
-              "name": "postechbe43",
+              "name": "postecha3ee",
               "type": "Microsoft.Storage/storageAccounts",
               "location": "[parameters('resourceLocation')]",
               "apiVersion": "2017-10-01"
