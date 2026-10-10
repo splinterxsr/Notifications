@@ -24,13 +24,13 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore Notifications.sln
+        run: dotnet restore Notifications.slnx
 
       - name: Build Solution
-        run: dotnet build Notifications.sln --no-restore --configuration Release
+        run: dotnet build Notifications.slnx --no-restore --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test Notifications.sln --no-build --configuration Release --verbosity normal
+        run: dotnet test Notifications.slnx --no-build --configuration Release --verbosity normal
 
       # Publica especificamente o projeto da Function gerando os arquivos de saída
       - name: Publish Function
