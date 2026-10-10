@@ -32,16 +32,23 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test Notifications.slnx --no-build --configuration Release --verbosity normal
 
-      # Publica especificamente o projeto da Function gerando os arquivos de saída
+      # Publica especificamente o projeto da Function
       - name: Publish Function
         run: dotnet publish Notifications.Function/Notifications.Function.csproj --configuration Release --output ./publish
 
-      # Salva os arquivos compilados como artefato para o deploy
+      # Cria o arquivo ZIP incluindo explicitamente arquivos ocultos (.azurefunctions)
+      - name: Package Function App
+        run: |
+          cd ./publish
+          zip -r ../function-app.zip . .azurefunctions*
+          cd ..
+
+      # Salva o arquivo ZIP gerado como artefato
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: function-app
-          path: ./publish
+          name: function-app-package
+          path: function-app.zip
 
   deploy:
     name: Deploy to Azure Function App
@@ -53,8 +60,8 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: function-app
-          path: ./publish
+          name: function-app-package
+          path: .
 
       # 1. Autenticação na Azure
       - name: Azure Login
@@ -62,9 +69,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 2. Deploy no Azure Function App
+      # 2. Deploy no Azure Function App apontando para o ZIP correto
       - name: Run Azure Functions Action
         uses: Azure/functions-action@v1
         with:
           app-name: sendemail-notifications
-          package: ./publish
+          package: function-app.zip
