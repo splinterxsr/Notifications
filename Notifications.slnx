@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Fcg.Contracts/Fcg.Contracts.csproj" />
   <Project Path="Notifications.Function/Notifications.Function.csproj" />
+  <Project Path="Notifications.Tests/Notifications.Tests.csproj" Id="ab7c849e-aaee-4203-96a5-d59c87a82534" />
 </Solution>
