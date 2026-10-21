@@ -17,6 +17,5 @@ A aplicação foi migrada de um Worker tradicional para uma função Serverless 
 ## Tecnologias Utilizadas
 
 * **.NET 10:** Framework principal para desenvolvimento backend.
-* **MassTransit:** Abstração utilizada para ler o envelope de mensagens gerado pelos produtores.
-* **Azure Bus Service:** Serviço de mensagens via tópicos utilizado no lugar do RabbitMQ.
+* **MassTransit.Azure.ServiceBus.Core 8.3.4:** Biblioteca para abstração de comunicação com Azure Bus Service
 ---
