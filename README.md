@@ -9,6 +9,7 @@ Este projeto tem como objetivo receber eventos de forma assíncrona e simular o 
 A aplicação foi migrada de um Worker tradicional para uma função Serverless orientada a eventos, executada dentro da Azure.
 
 * **Notifications.Function:** Função (Azure Functions) autossuficiente invocada via eventos.
+* **Notifications.Tests**: Teste unitários básicos para a function.
 * **Gatilhos de Execução:** Consome as mensagens em pacotes (batches) dos tópicos `payments-topic` e `users-topic`.
 
 ---
