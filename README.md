@@ -17,5 +17,7 @@ A aplicação foi migrada de um Worker tradicional para uma função Serverless 
 ## Tecnologias Utilizadas
 
 * **.NET 10:** Framework principal para desenvolvimento backend.
-* **MassTransit.Azure.ServiceBus.Core 8.3.4:** Biblioteca para abstração de comunicação com Azure Bus Service
+* **Azure Functions (Worker v4)**: Framework de computação serverless para .NET (Isolated Worker) com suporte a ASP.NET Core integrado.
+* **Azure Service Bus**: Extensão de mensageria para processamento reativo de filas/tópicos.
+* **OpenTelemetry & Azure Monitor**: Stack completa de observabilidade, métricas e telemetria integrada à nuvem da Azure.
 ---
